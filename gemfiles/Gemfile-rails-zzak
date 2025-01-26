@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "rails", path: "~/code/rails"
+#gem "rails", github: "zzak/rails", branch: "actionview-remote-forms"
+
+gem "propshaft"
+gem "sqlite3"

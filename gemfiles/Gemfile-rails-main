@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "rails", github: "rails/rails"
+
+gem "propshaft"
+gem "sqlite3"
