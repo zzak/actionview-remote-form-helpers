@@ -26,7 +26,7 @@ module ActionViewRemoteFormHelpers
   end
 
   def submit_tag(value = "Save changes", options = {})
-    return super if ActionView.version < "8.1.0.alpha"
+    return super if ActionView.version < "8.2.0.alpha"
     options = options.deep_stringify_keys
     tag_options = { "type" => "submit", "name" => "commit", "value" => value }.update(options)
     _set_default_disable_with(value, tag_options)
