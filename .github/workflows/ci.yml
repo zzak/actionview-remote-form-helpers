@@ -30,6 +30,8 @@ jobs:
             rails-version: main
             continue-on-error: true
         exclude:
+          - { ruby-version: head, rails-version: 6-1 }
+          - { ruby-version: head, rails-version: 7-0 }
           - { ruby-version: 3.0, rails-version: 8-0 }
           - { ruby-version: 3.1, rails-version: 8-0 }
           - { ruby-version: 3.1, rails-version: main }
