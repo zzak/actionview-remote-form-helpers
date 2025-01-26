@@ -18,13 +18,13 @@ class FormForHelperTest < ActionView::TestCase
     @comment = Comment.new
     def @post.errors
       Class.new {
-        def [](field); field == "author_name" ? ["can't be empty"] : [] end
+        def [](field); field == "author_name" ? [ "can't be empty" ] : [] end
         def empty?() false end
         def count() 1 end
-        def full_messages() ["Author name can't be empty"] end
+        def full_messages() [ "Author name can't be empty" ] end
       }.new
     end
-    def @post.to_key; [123]; end
+    def @post.to_key; [ 123 ]; end
     def @post.id; 0; end
     def @post.id_before_type_cast; "omg"; end
     def @post.id_came_from_user?; true; end
@@ -119,7 +119,7 @@ class FormForHelperTest < ActionView::TestCase
 
     assert_dom_equal expected, @rendered
 
-    assert_no_match %r|data-remote="true"|, @rendered
+    assert_no_match %r{data-remote="true"}, @rendered
   end
 
   def test_form_for_with_html_options_adds_options_to_form_tag
@@ -131,8 +131,8 @@ class FormForHelperTest < ActionView::TestCase
 
   def test_form_for_with_data_attributes
     form_for(@post, data: { behavior: "stuff" }, remote: true) { }
-    assert_match %r|data-behavior="stuff"|, @rendered
-    assert_match %r|data-remote="true"|, @rendered
+    assert_match %r{data-behavior="stuff"}, @rendered
+    assert_match %r{data-remote="true"}, @rendered
   end
 
   private
@@ -140,26 +140,26 @@ class FormForHelperTest < ActionView::TestCase
       method = options[:method]
 
       if options.fetch(:enforce_utf8, true)
-        txt = +%{<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />}
+        txt = +%(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
       else
         txt = +""
       end
 
-      if method && !%w(get post).include?(method.to_s)
-        txt << %{<input name="_method" type="hidden" value="#{method}" autocomplete="off" />}
+      if method && !%w[get post].include?(method.to_s)
+        txt << %(<input name="_method" type="hidden" value="#{method}" autocomplete="off" />)
       end
 
       txt
     end
 
     def form_text(action = "/", id = nil, html_class = nil, remote = nil, multipart = nil, method = nil)
-      txt =  +%{<form accept-charset="UTF-8"} + (action ? %{ action="#{action}"} : "")
-      txt << %{ enctype="multipart/form-data"} if multipart
-      txt << %{ data-remote="true"} if remote
-      txt << %{ class="#{html_class}"} if html_class
-      txt << %{ id="#{id}"} if id
+      txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
+      txt << %( enctype="multipart/form-data") if multipart
+      txt << %( data-remote="true") if remote
+      txt << %( class="#{html_class}") if html_class
+      txt << %( id="#{id}") if id
       method = method.to_s == "get" ? "get" : "post"
-      txt << %{ method="#{method}">}
+      txt << %( method="#{method}">)
     end
 
     def whole_form(action = "/", id = nil, html_class = nil, options = {})

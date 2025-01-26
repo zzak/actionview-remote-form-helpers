@@ -14,7 +14,7 @@ module RenderERBUtils
   def view
     @view ||= begin
       path = ActionView::FileSystemResolver.new(FIXTURE_LOAD_PATH)
-      view_paths = ActionView::PathSet.new([path])
+      view_paths = ActionView::PathSet.new([ path ])
       view = ActionView::Base.with_empty_template_cache
       view.with_view_paths(view_paths)
     end

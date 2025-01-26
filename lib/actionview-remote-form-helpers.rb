@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'actionview-remote-form-helpers/railtie' if defined?(Rails::Railtie)
+require "actionview-remote-form-helpers/railtie" if defined?(Rails::Railtie)
 
 module ActionViewRemoteFormHelpers
   def form_for(record, options = {}, &block)

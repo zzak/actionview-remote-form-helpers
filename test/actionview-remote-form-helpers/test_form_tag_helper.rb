@@ -20,11 +20,11 @@ class FormTagHelperTest < ActionView::TestCase
 
     (+"").tap do |txt|
       if enforce_utf8
-        txt << %{<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />}
+        txt << %(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
       end
 
-      if method && !%w(get post).include?(method.to_s)
-        txt << %{<input name="_method" type="hidden" value="#{method}" autocomplete="off" />}
+      if method && !%w[get post].include?(method.to_s)
+        txt << %(<input name="_method" type="hidden" value="#{method}" autocomplete="off" />)
       end
     end
   end
@@ -34,12 +34,12 @@ class FormTagHelperTest < ActionView::TestCase
 
     method = method.to_s == "get" ? "get" : "post"
 
-    txt =  +%{<form accept-charset="UTF-8"} + (action ? %{ action="#{action}"} : "")
-    txt << %{ enctype="multipart/form-data"} if enctype
-    txt << %{ data-remote="true"} if remote
-    txt << %{ class="#{html_class}"} if html_class
-    txt << %{ id="#{id}"} if id
-    txt << %{ method="#{method}">}
+    txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
+    txt << %( enctype="multipart/form-data") if enctype
+    txt << %( data-remote="true") if remote
+    txt << %( class="#{html_class}") if html_class
+    txt << %( id="#{id}") if id
+    txt << %( method="#{method}">)
   end
 
   def whole_form(action = "http://www.example.com", options = {})

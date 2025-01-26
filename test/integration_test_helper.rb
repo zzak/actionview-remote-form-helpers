@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'rails'
+require "rails"
 require "rails/test_help"
 require "fileutils"
 require "digest/sha1"
@@ -14,9 +14,9 @@ module RailsAppHelpers
   end
 
   private
-    def create_new_rails_app(app_dir, options=[])
+    def create_new_rails_app(app_dir, options = [])
       require "rails/generators/rails/app/app_generator"
-      Rails::Generators::AppGenerator.start([app_dir, *options, "--skip-bundle", "--skip-bootsnap", "--quiet"])
+      Rails::Generators::AppGenerator.start([ app_dir, *options, "--skip-bundle", "--skip-bootsnap", "--quiet" ])
 
       Dir.chdir(app_dir) do
         gemfile = File.read("Gemfile")
@@ -48,7 +48,7 @@ module RailsAppHelpers
       end
     end
 
-    def build_app(options=[])
+    def build_app(options = [])
       create_new_rails_app(tmp_path, options)
     end
 
@@ -59,7 +59,7 @@ module RailsAppHelpers
     def tmp_path
       @tmp_path ||=
         (
-          variant = [RUBY_VERSION, Gem.loaded_specs["rails"].full_gem_path,]
+          variant = [ RUBY_VERSION, Gem.loaded_specs["rails"].full_gem_path ]
           app_name = "app_#{Digest::SHA1.hexdigest(variant.to_s)}"
           Dir.mktmpdir(app_name)
         )

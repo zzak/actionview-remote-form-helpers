@@ -3,8 +3,8 @@
 Gem::Specification.new do |spec|
   spec.name = "actionview-remote-form-helpers"
   spec.version = "1.0.0"
-  spec.authors = ["zzak"]
-  spec.email = ["zzakscott@gmail.com"]
+  spec.authors = [ "zzak" ]
+  spec.email = [ "zzakscott@gmail.com" ]
 
   spec.summary = "Rails legacy support for `form` with `remote` options."
   spec.description = "For apps that are still using `remote` and `local` options in `form_with`."
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
         f.start_with?(*%w[test/ .git .github Gemfile])
     end
   end
-  spec.require_paths = ["lib"]
+  spec.require_paths = [ "lib" ]
 end
