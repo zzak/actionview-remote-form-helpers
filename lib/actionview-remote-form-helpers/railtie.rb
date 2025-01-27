@@ -5,10 +5,7 @@ module ActionViewRemoteFormHelpers
     initializer "actionview_remote_forms_helper.action_view" do
       ActiveSupport.on_load(:action_view) do
         unless ActionView::Base.respond_to?(:automatically_disable_submit_tag)
-          ActionView::Base.cattr_accessor :automatically_disable_submit_tag, default: false
-
-          ActionView::Base.automatically_disable_submit_tag =
-            Rails.application.config.action_view.delete(:automatically_disable_submit_tag)
+          ActionView::Base.cattr_accessor :automatically_disable_submit_tag, default: true
         end
 
         unless ActionView::Helpers::FormTagHelper.respond_to?(:embed_authenticity_token_in_remote_forms)
