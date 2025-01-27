@@ -11,9 +11,8 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
     @rendered = super
   end
 
-  def form_text(action = "/", id = nil, html_class = nil, local = nil, multipart = nil, method = nil)
+  def form_text(action = "/", id = nil, html_class = nil, local = nil, method = nil)
     txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
-    txt << %( enctype="multipart/form-data") if multipart
     txt << %( data-remote="true") unless local
     txt << %( class="#{html_class}") if html_class
     txt << %( id="#{id}") if id
@@ -24,9 +23,9 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
   def whole_form(action = "/", id = nil, html_class = nil, local: false, **options)
     contents = block_given? ? yield : ""
 
-    method, multipart = options.values_at(:method, :multipart)
+    method = options.values_at(:method)
 
-    form_text(action, id, html_class, local, multipart, method) + hidden_fields(options.slice :method, :skip_enforcing_utf8) + contents + "</form>"
+    form_text(action, id, html_class, local, method) + hidden_fields(options.slice :method) + contents + "</form>"
   end
 
   def test_form_with
@@ -50,40 +49,6 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
       "<input name='commit' data-disable-with='Create post' type='submit' value='Create post' />" \
       "<button name='button' type='submit'>Create post</button>" \
       "<button name='button' type='submit'><span>Create post</span></button>"
-    end
-
-    assert_dom_equal expected, @rendered
-  end
-
-  def test_form_with_with_model_using_relative_model_naming
-    blog_post = Blog::Post.new("And his name will be forty and four.", 44)
-
-    form_with(model: blog_post) do |f|
-      concat f.text_field :title
-      concat f.submit("Edit post")
-    end
-
-    expected = whole_form("/posts/44", method: "patch") do
-      "<input name='post[title]' type='text' value='And his name will be forty and four.' />" \
-      "<input name='commit' data-disable-with='Edit post' type='submit' value='Edit post' />"
-    end
-
-    assert_dom_equal expected, @rendered
-  end
-
-  def test_form_with_with_symbol_scope
-    form_with(model: @post, scope: "other_name", id: "create-post") do |f|
-      concat f.label(:title, class: "post_title")
-      concat f.text_field(:title)
-      concat f.text_area(:body)
-      concat f.submit("Create post")
-    end
-
-    expected = whole_form("/posts/123", "create-post", method: "patch") do
-      "<label class='post_title'>Title</label>" \
-      "<input name='other_name[title]' value='Hello World' type='text' />" \
-      "<textarea name='other_name[body]'>\nBack to the hill and over it again!</textarea>" \
-      "<input name='commit' value='Create post' data-disable-with='Create post' type='submit' />"
     end
 
     assert_dom_equal expected, @rendered

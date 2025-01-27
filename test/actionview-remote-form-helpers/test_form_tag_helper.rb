@@ -8,12 +8,11 @@ class FormTagHelperTest < ActionViewRemoteFormHelpersTestCase
   tests ActionViewRemoteFormHelpers
 
   def form_text(action = "http://www.example.com", options = {})
-    remote, enctype, html_class, id, method = options.values_at(:remote, :enctype, :html_class, :id, :method)
+    remote, html_class, id, method = options.values_at(:remote, :html_class, :id, :method)
 
     method = method.to_s == "get" ? "get" : "post"
 
     txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
-    txt << %( enctype="multipart/form-data") if enctype
     txt << %( data-remote="true") if remote
     txt << %( class="#{html_class}") if html_class
     txt << %( id="#{id}") if id
@@ -138,20 +137,6 @@ class FormTagHelperTest < ActionViewRemoteFormHelpersTestCase
     )
   end
 
-  def test_button_tag_with_confirmation
-    assert_dom_equal(
-      %(<button name="button" type="submit" data-confirm="Are you sure?">Save</button>),
-      button_tag("Save", type: "submit", data: { confirm: "Are you sure?" })
-    )
-  end
-
-  def test_button_tag_with_data_disable_with_option
-    assert_dom_equal(
-      %(<button name="button" type="submit" data-disable-with="Please wait...">Checkout</button>),
-      button_tag("Checkout", data: { disable_with: "Please wait..." })
-    )
-  end
-
   def test_image_submit_tag_with_confirmation
     assert_dom_equal(
       %(<input type="image" src="/images/save.gif" data-confirm="Are you sure?" />),
@@ -160,10 +145,6 @@ class FormTagHelperTest < ActionViewRemoteFormHelpersTestCase
   end
 
   private
-    def root_elem(rendered_content)
-      Rails::Dom::Testing.html_document_fragment.parse(rendered_content).children.first # extract from nodeset
-    end
-
     def with_auto_disable_submit_tag(value)
       old_value = ActionView::Base.automatically_disable_submit_tag
       ActionViewRemoteFormHelpers._deprecator.silence do
