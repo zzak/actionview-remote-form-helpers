@@ -42,11 +42,12 @@ module ActionViewRemoteFormHelpers
   end
 
   def self._deprecator
-    @deprecator ||= if ActionView.version < "7.1"
-                      ActiveSupport::Deprecation
-                    else
-                      ActionView.deprecator
-                    end
+    @deprecator ||=
+      if ActionView.version < "7.1"
+        ActiveSupport::Deprecation
+      else
+        ActionView.deprecator
+      end
   end
 
   private
