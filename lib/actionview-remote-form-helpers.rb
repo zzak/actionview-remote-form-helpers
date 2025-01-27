@@ -12,7 +12,7 @@ module ActionViewRemoteFormHelpers
 
     options[:local] = !remote
 
-    ActionView.deprecator.silence do
+    ActionViewRemoteFormHelpers._deprecator.silence do
       super
     end
   end
@@ -20,7 +20,7 @@ module ActionViewRemoteFormHelpers
   def form_tag(url_for_options = {}, options = {}, &block)
     options = _remote_html_options(options)
 
-    ActionView.deprecator.silence do
+    ActionViewRemoteFormHelpers._deprecator.silence do
       super
     end
   end
@@ -36,9 +36,17 @@ module ActionViewRemoteFormHelpers
     tag_options = { "type" => "submit", "name" => "commit", "value" => value }.update(options)
     _set_default_disable_with(value, tag_options)
 
-    ActionView.deprecator.silence do
+    ActionViewRemoteFormHelpers._deprecator.silence do
       super(value, tag_options)
     end
+  end
+
+  def self._deprecator
+    @deprecator ||= if ActionView.version < "7.1"
+                      ActiveSupport::Deprecation
+                    else
+                      ActionView.deprecator
+                    end
   end
 
   private

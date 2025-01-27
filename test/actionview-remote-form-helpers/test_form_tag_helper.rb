@@ -196,12 +196,12 @@ class FormTagHelperTest < ActionView::TestCase
 
     def with_auto_disable_submit_tag(value)
       old_value = ActionView::Base.automatically_disable_submit_tag
-      ActionView.deprecator.silence do
+      ActionViewRemoteFormHelpers._deprecator.silence do
         ActionView::Base.automatically_disable_submit_tag = value
       end
       yield
     ensure
-      ActionView.deprecator.silence do
+      ActionViewRemoteFormHelpers._deprecator.silence do
         ActionView::Base.automatically_disable_submit_tag = old_value
       end
     end

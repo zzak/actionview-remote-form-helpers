@@ -265,12 +265,12 @@ class FormWithTest < ActionViewRemoteFormHelpersTest
 
     def with_generates_remote_forms(value)
       old_value = ActionView::Helpers::FormHelper.form_with_generates_remote_forms
-      ActionView.deprecator.silence do
+      ActionViewRemoteFormHelpers._deprecator.silence do
         ActionView::Helpers::FormHelper.form_with_generates_remote_forms = value
       end
       yield
     ensure
-      ActionView.deprecator.silence do
+      ActionViewRemoteFormHelpers._deprecator.silence do
         ActionView::Helpers::FormHelper.form_with_generates_remote_forms = old_value
       end
     end
