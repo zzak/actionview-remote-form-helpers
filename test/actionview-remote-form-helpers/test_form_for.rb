@@ -169,17 +169,4 @@ class FormForHelperTest < ActionView::TestCase
 
       form_text(action, id, html_class, remote, multipart, method) + hidden_fields(options.slice :method, :enforce_utf8) + contents + "</form>"
     end
-
-    def protect_against_forgery?
-      false
-    end
-
-    def with_default_enforce_utf8(value)
-      old_value = ActionView::Helpers::FormTagHelper.default_enforce_utf8
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = value
-
-      yield
-    ensure
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = old_value
-    end
 end

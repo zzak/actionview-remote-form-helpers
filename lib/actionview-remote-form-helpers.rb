@@ -12,12 +12,17 @@ module ActionViewRemoteFormHelpers
 
     options[:local] = !remote
 
-    super
+    ActionView.deprecator.silence do
+      super
+    end
   end
 
   def form_tag(url_for_options = {}, options = {}, &block)
     options = _remote_html_options(options)
-    super
+
+    ActionView.deprecator.silence do
+      super
+    end
   end
 
   def form_with(model: false, scope: nil, url: nil, format: nil, **options, &block)
@@ -30,7 +35,10 @@ module ActionViewRemoteFormHelpers
     options = options.deep_stringify_keys
     tag_options = { "type" => "submit", "name" => "commit", "value" => value }.update(options)
     _set_default_disable_with(value, tag_options)
-    super(value, tag_options)
+
+    ActionView.deprecator.silence do
+      super(value, tag_options)
+    end
   end
 
   private

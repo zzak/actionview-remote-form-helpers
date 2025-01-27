@@ -15,16 +15,6 @@ class ActionViewRemoteFormHelpersTest < ActionView::TestCase
   teardown do
     ActionView::Helpers::FormHelper.form_with_generates_ids = @old_value
   end
-
-  private
-    def with_default_enforce_utf8(value)
-      old_value = ActionView::Helpers::FormTagHelper.default_enforce_utf8
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = value
-
-      yield
-    ensure
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = old_value
-    end
 end
 
 class FormWithTest < ActionViewRemoteFormHelpersTest
@@ -214,25 +204,22 @@ class FormWithTest < ActionViewRemoteFormHelpersTest
   end
 
   def test_form_is_not_remote_by_default_if_form_with_generates_remote_forms_is_false
-    old_value = ActionView::Helpers::FormHelper.form_with_generates_remote_forms
-    ActionView::Helpers::FormHelper.form_with_generates_remote_forms = false
+    with_generates_remote_forms(false) do
+      form_with(model: @post, url: "/", id: "create-post", method: :patch) do |f|
+        concat f.text_field(:title)
+        concat f.text_area(:body)
+        concat f.check_box(:secret)
+      end
 
-    form_with(model: @post, url: "/", id: "create-post", method: :patch) do |f|
-      concat f.text_field(:title)
-      concat f.text_area(:body)
-      concat f.check_box(:secret)
+      expected = whole_form("/", "create-post", method: "patch", local: true) do
+        "<input name='post[title]' type='text' value='Hello World' id='post_title' />" \
+        "<textarea name='post[body]' id='post_body'>\nBack to the hill and over it again!</textarea>" \
+        "<input name='post[secret]' type='hidden' value='0' autocomplete='off' />" \
+        "<input name='post[secret]' checked='checked' type='checkbox' value='1' id='post_secret' />"
+      end
+
+      assert_dom_equal expected, @rendered
     end
-
-    expected = whole_form("/", "create-post", method: "patch", local: true) do
-      "<input name='post[title]' type='text' value='Hello World' id='post_title' />" \
-      "<textarea name='post[body]' id='post_body'>\nBack to the hill and over it again!</textarea>" \
-      "<input name='post[secret]' type='hidden' value='0' autocomplete='off' />" \
-      "<input name='post[secret]' checked='checked' type='checkbox' value='1' id='post_secret' />"
-    end
-
-    assert_dom_equal expected, @rendered
-  ensure
-    ActionView::Helpers::FormHelper.form_with_generates_remote_forms = old_value
   end
 
   def test_form_with_with_data_attributes
@@ -276,7 +263,15 @@ class FormWithTest < ActionViewRemoteFormHelpersTest
       form_text(action, id, html_class, local, multipart, method) + hidden_fields(options.slice :method, :skip_enforcing_utf8) + contents + "</form>"
     end
 
-    def protect_against_forgery?
-      false
+    def with_generates_remote_forms(value)
+      old_value = ActionView::Helpers::FormHelper.form_with_generates_remote_forms
+      ActionView.deprecator.silence do
+        ActionView::Helpers::FormHelper.form_with_generates_remote_forms = value
+      end
+      yield
+    ensure
+      ActionView.deprecator.silence do
+        ActionView::Helpers::FormHelper.form_with_generates_remote_forms = old_value
+      end
     end
 end

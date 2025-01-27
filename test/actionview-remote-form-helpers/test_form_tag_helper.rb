@@ -95,23 +95,21 @@ class FormTagHelperTest < ActionView::TestCase
   end
 
   def test_empty_submit_tag_with_opt_out
-    ActionView::Base.automatically_disable_submit_tag = false
-    assert_dom_equal(
-      %(<input name='commit' type="submit" value="Save" />),
-      submit_tag("Save")
-    )
-  ensure
-    ActionView::Base.automatically_disable_submit_tag = true
+    with_auto_disable_submit_tag(false) do
+      assert_dom_equal(
+        %(<input name='commit' type="submit" value="Save" />),
+        submit_tag("Save")
+      )
+    end
   end
 
   def test_empty_submit_tag_with_opt_out_and_explicit_disabling
-    ActionView::Base.automatically_disable_submit_tag = false
-    assert_dom_equal(
-      %(<input name='commit' type="submit" value="Save" />),
-      submit_tag("Save", data: { disable_with: false })
-    )
-  ensure
-    ActionView::Base.automatically_disable_submit_tag = true
+    with_auto_disable_submit_tag(false) do
+      assert_dom_equal(
+        %(<input name='commit' type="submit" value="Save" />),
+        submit_tag("Save", data: { disable_with: false })
+      )
+    end
   end
 
   def test_submit_tag_having_data_disable_with_string
@@ -191,22 +189,21 @@ class FormTagHelperTest < ActionView::TestCase
     )
   end
 
-  def protect_against_forgery?
-    false
-  end
-
   private
     def root_elem(rendered_content)
       Rails::Dom::Testing.html_document_fragment.parse(rendered_content).children.first # extract from nodeset
     end
 
-    def with_default_enforce_utf8(value)
-      old_value = ActionView::Helpers::FormTagHelper.default_enforce_utf8
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = value
-
+    def with_auto_disable_submit_tag(value)
+      old_value = ActionView::Base.automatically_disable_submit_tag
+      ActionView.deprecator.silence do
+        ActionView::Base.automatically_disable_submit_tag = value
+      end
       yield
     ensure
-      ActionView::Helpers::FormTagHelper.default_enforce_utf8 = old_value
+      ActionView.deprecator.silence do
+        ActionView::Base.automatically_disable_submit_tag = old_value
+      end
     end
 
     def with_prepend_content_exfiltration_prevention(value)
