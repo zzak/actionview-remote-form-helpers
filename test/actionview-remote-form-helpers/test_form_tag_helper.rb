@@ -4,30 +4,8 @@ require "test_helper"
 
 require "lib/controller/fake_models"
 
-class FormTagHelperTest < ActionView::TestCase
-  include RenderERBUtils
-
+class FormTagHelperTest < ActionViewRemoteFormHelpersTestCase
   tests ActionViewRemoteFormHelpers
-
-  def setup
-    super
-    @controller = BasicController.new
-  end
-
-  def hidden_fields(options = {})
-    method = options[:method]
-    enforce_utf8 = options.fetch(:enforce_utf8, true)
-
-    (+"").tap do |txt|
-      if enforce_utf8
-        txt << %(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
-      end
-
-      if method && !%w[get post].include?(method.to_s)
-        txt << %(<input name="_method" type="hidden" value="#{method}" autocomplete="off" />)
-      end
-    end
-  end
 
   def form_text(action = "http://www.example.com", options = {})
     remote, enctype, html_class, id, method = options.values_at(:remote, :enctype, :html_class, :id, :method)
@@ -50,14 +28,6 @@ class FormTagHelperTest < ActionView::TestCase
     end
 
     out
-  end
-
-  def url_for(options)
-    if options.is_a?(Hash)
-      "http://www.example.com"
-    else
-      super
-    end
   end
 
   def test_form_tag

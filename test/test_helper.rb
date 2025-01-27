@@ -10,47 +10,49 @@ require "actionview-remote-form-helpers"
 
 require "minitest/autorun"
 
-module RenderERBUtils
-  def view
-    @view ||= begin
-      path = ActionView::FileSystemResolver.new(FIXTURE_LOAD_PATH)
-      view_paths = ActionView::PathSet.new([ path ])
-      view = ActionView::Base.with_empty_template_cache
-      view.with_view_paths(view_paths)
+class ActionViewRemoteFormHelpersTestCase < ActionView::TestCase
+  def setup
+    @post = Post.new
+    def @post.id; 0; end
+    def @post.to_param; "123"; end
+
+    @post.persisted   = true
+    @post.title       = "Hello World"
+    @post.body        = "Back to the hill and over it again!"
+  end
+
+  Routes = ActionDispatch::Routing::RouteSet.new
+  Routes.draw do
+    resources :posts
+  end
+
+  include Routes.url_helpers
+
+  def url_for(options)
+    if options.is_a?(Hash)
+      "http://www.example.com"
+    else
+      super
     end
   end
 
-  def render_erb(string)
-    @virtual_path = nil
+  private
+    def hidden_fields(options = {})
+      method = options[:method]
 
-    template = ActionView::Template.new(
-      string.strip,
-      "test template",
-      ActionView::Template.handler_for_extension(:erb),
-      format: :html, locals: [])
+      if options.fetch(:skip_enforcing_utf8, false)
+        txt = +""
+      else
+        txt = +%(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
+      end
 
-    view = ActionView::Base.with_empty_template_cache
-    template.render(view.empty, {}).strip
-  end
-end
+      if method && !%w[get post].include?(method.to_s)
+        txt << %(<input name="_method" type="hidden" value="#{method}" autocomplete="off" />)
+      end
 
-class BasicController
-  attr_accessor :request, :response
-
-  def config
-    @config ||= ActiveSupport::InheritableOptions.new(ActionController::Base.config).tap do |config|
-      # VIEW TODO: View tests should not require a controller
-      public_dir = File.expand_path("fixtures/public", __dir__)
-      config.assets_dir = public_dir
-      config.javascripts_dir = "#{public_dir}/javascripts"
-      config.stylesheets_dir = "#{public_dir}/stylesheets"
-      config.assets          = ActiveSupport::InheritableOptions.new(prefix: "assets")
-      config
+      txt
     end
-  end
 end
-
-ActionView::RoutingUrlFor.include(ActionDispatch::Routing::UrlFor)
 
 unless ActionView::Base.respond_to?(:automatically_disable_submit_tag)
   ActionView::Base.cattr_accessor :automatically_disable_submit_tag, default: true

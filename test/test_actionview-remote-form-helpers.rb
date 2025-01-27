@@ -5,7 +5,7 @@ require "rack/test"
 require "rails-dom-testing"
 
 module ApplicationTests
-  class UploadsIntegrationTest < ActiveSupport::TestCase
+  class ActionViewRemoteFormHelpersIntegrationTest < ActiveSupport::TestCase
     include RailsAppHelpers
     include Rack::Test::Methods
     include Rails::Dom::Testing::Assertions
