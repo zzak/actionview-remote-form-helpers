@@ -11,6 +11,24 @@ class FormForHelperTest < ActionViewRemoteFormHelpersTestCase
     @rendered = super
   end
 
+  def form_text(action = "/", id = nil, html_class = nil, remote = nil, multipart = nil, method = nil)
+    txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
+    txt << %( enctype="multipart/form-data") if multipart
+    txt << %( data-remote="true") if remote
+    txt << %( class="#{html_class}") if html_class
+    txt << %( id="#{id}") if id
+    method = method.to_s == "get" ? "get" : "post"
+    txt << %( method="#{method}">)
+  end
+
+  def whole_form(action = "/", id = nil, html_class = nil, options = {})
+    contents = block_given? ? yield : ""
+
+    method, remote, multipart = options.values_at(:method, :remote, :multipart)
+
+    form_text(action, id, html_class, remote, multipart, method) + hidden_fields(options.slice :method, :enforce_utf8) + contents + "</form>"
+  end
+
   def test_form_for
     form_for(@post, html: { id: "create-post" }) do |f|
       concat f.label(:title) { "The Title" }
@@ -49,23 +67,4 @@ class FormForHelperTest < ActionViewRemoteFormHelpersTestCase
     assert_match %r{data-behavior="stuff"}, @rendered
     assert_match %r{data-remote="true"}, @rendered
   end
-
-  private
-    def form_text(action = "/", id = nil, html_class = nil, remote = nil, multipart = nil, method = nil)
-      txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
-      txt << %( enctype="multipart/form-data") if multipart
-      txt << %( data-remote="true") if remote
-      txt << %( class="#{html_class}") if html_class
-      txt << %( id="#{id}") if id
-      method = method.to_s == "get" ? "get" : "post"
-      txt << %( method="#{method}">)
-    end
-
-    def whole_form(action = "/", id = nil, html_class = nil, options = {})
-      contents = block_given? ? yield : ""
-
-      method, remote, multipart = options.values_at(:method, :remote, :multipart)
-
-      form_text(action, id, html_class, remote, multipart, method) + hidden_fields(options.slice :method, :enforce_utf8) + contents + "</form>"
-    end
 end

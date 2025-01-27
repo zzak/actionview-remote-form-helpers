@@ -175,13 +175,4 @@ class FormTagHelperTest < ActionViewRemoteFormHelpersTestCase
         ActionView::Base.automatically_disable_submit_tag = old_value
       end
     end
-
-    def with_prepend_content_exfiltration_prevention(value)
-      old_value = ActionView::Helpers::ContentExfiltrationPreventionHelper.prepend_content_exfiltration_prevention
-      ActionView::Helpers::ContentExfiltrationPreventionHelper.prepend_content_exfiltration_prevention = value
-
-      yield
-    ensure
-      ActionView::Helpers::ContentExfiltrationPreventionHelper.prepend_content_exfiltration_prevention = old_value
-    end
 end

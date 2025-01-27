@@ -7,18 +7,26 @@ require "lib/controller/fake_models"
 class FormWithTest < ActionViewRemoteFormHelpersTestCase
   tests ActionViewRemoteFormHelpers
 
-  setup do
-    @old_value = ActionView::Helpers::FormHelper.form_with_generates_ids
-    ActionView::Helpers::FormHelper.form_with_generates_ids = true
-  end
-
-  teardown do
-    ActionView::Helpers::FormHelper.form_with_generates_ids = @old_value
-  end
-
-
   def form_with(*, **)
     @rendered = super
+  end
+
+  def form_text(action = "/", id = nil, html_class = nil, local = nil, multipart = nil, method = nil)
+    txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
+    txt << %( enctype="multipart/form-data") if multipart
+    txt << %( data-remote="true") unless local
+    txt << %( class="#{html_class}") if html_class
+    txt << %( id="#{id}") if id
+    method = method.to_s == "get" ? "get" : "post"
+    txt << %( method="#{method}">)
+  end
+
+  def whole_form(action = "/", id = nil, html_class = nil, local: false, **options)
+    contents = block_given? ? yield : ""
+
+    method, multipart = options.values_at(:method, :multipart)
+
+    form_text(action, id, html_class, local, multipart, method) + hidden_fields(options.slice :method, :skip_enforcing_utf8) + contents + "</form>"
   end
 
   def test_form_with
@@ -35,10 +43,10 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
     end
 
     expected = whole_form("/posts/123", "create-post", method: "patch") do
-      "<label for='post_title'>The Title</label>" \
-      "<input name='post[title]' type='text' value='Hello World' id='post_title' />" \
-      "<textarea name='post[body]' id='post_body'>\nBack to the hill and over it again!</textarea>" \
-      "<select name='post[category]' id='post_category'><option value='animal'>animal</option>\n<option value='economy'>economy</option>\n<option value='sports'>sports</option></select>" \
+      "<label>The Title</label>" \
+      "<input name='post[title]' type='text' value='Hello World' />" \
+      "<textarea name='post[body]'>\nBack to the hill and over it again!</textarea>" \
+      "<select name='post[category]'><option value='animal'>animal</option>\n<option value='economy'>economy</option>\n<option value='sports'>sports</option></select>" \
       "<input name='commit' data-disable-with='Create post' type='submit' value='Create post' />" \
       "<button name='button' type='submit'>Create post</button>" \
       "<button name='button' type='submit'><span>Create post</span></button>"
@@ -56,7 +64,7 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
     end
 
     expected = whole_form("/posts/44", method: "patch") do
-      "<input name='post[title]' type='text' value='And his name will be forty and four.' id='post_title' />" \
+      "<input name='post[title]' type='text' value='And his name will be forty and four.' />" \
       "<input name='commit' data-disable-with='Edit post' type='submit' value='Edit post' />"
     end
 
@@ -72,9 +80,9 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
     end
 
     expected = whole_form("/posts/123", "create-post", method: "patch") do
-      "<label for='other_name_title' class='post_title'>Title</label>" \
-      "<input name='other_name[title]' value='Hello World' type='text' id='other_name_title' />" \
-      "<textarea name='other_name[body]' id='other_name_body'>\nBack to the hill and over it again!</textarea>" \
+      "<label class='post_title'>Title</label>" \
+      "<input name='other_name[title]' value='Hello World' type='text' />" \
+      "<textarea name='other_name[body]'>\nBack to the hill and over it again!</textarea>" \
       "<input name='commit' value='Create post' data-disable-with='Create post' type='submit' />"
     end
 
@@ -88,8 +96,8 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
     end
 
     expected = whole_form("/", "create-post", method: "patch") do
-      "<input name='post[title]' type='text' value='Hello World' id='post_title' />" \
-      "<textarea name='post[body]' id='post_body' >\nBack to the hill and over it again!</textarea>" \
+      "<input name='post[title]' type='text' value='Hello World' />" \
+      "<textarea name='post[body]' >\nBack to the hill and over it again!</textarea>" \
     end
 
     assert_dom_equal expected, @rendered
@@ -103,8 +111,8 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
       end
 
       expected = whole_form("/", "create-post", method: "patch", local: true) do
-        "<input name='post[title]' type='text' value='Hello World' id='post_title' />" \
-        "<textarea name='post[body]' id='post_body'>\nBack to the hill and over it again!</textarea>" \
+        "<input name='post[title]' type='text' value='Hello World' />" \
+        "<textarea name='post[body]'>\nBack to the hill and over it again!</textarea>" \
       end
 
       assert_dom_equal expected, @rendered
@@ -118,24 +126,6 @@ class FormWithTest < ActionViewRemoteFormHelpersTestCase
   end
 
   private
-    def form_text(action = "/", id = nil, html_class = nil, local = nil, multipart = nil, method = nil)
-      txt =  +%(<form accept-charset="UTF-8") + (action ? %( action="#{action}") : "")
-      txt << %( enctype="multipart/form-data") if multipart
-      txt << %( data-remote="true") unless local
-      txt << %( class="#{html_class}") if html_class
-      txt << %( id="#{id}") if id
-      method = method.to_s == "get" ? "get" : "post"
-      txt << %( method="#{method}">)
-    end
-
-    def whole_form(action = "/", id = nil, html_class = nil, local: false, **options)
-      contents = block_given? ? yield : ""
-
-      method, multipart = options.values_at(:method, :multipart)
-
-      form_text(action, id, html_class, local, multipart, method) + hidden_fields(options.slice :method, :skip_enforcing_utf8) + contents + "</form>"
-    end
-
     def with_generates_remote_forms(value)
       old_value = ActionView::Helpers::FormHelper.form_with_generates_remote_forms
       ActionViewRemoteFormHelpers._deprecator.silence do
