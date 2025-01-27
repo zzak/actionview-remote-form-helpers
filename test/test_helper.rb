@@ -40,11 +40,7 @@ class ActionViewRemoteFormHelpersTestCase < ActionView::TestCase
     def hidden_fields(options = {})
       method = options[:method]
 
-      if options.fetch(:skip_enforcing_utf8, false)
-        txt = +""
-      else
-        txt = +%(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
-      end
+      txt = +%(<input name="utf8" type="hidden" value="&#x2713;" autocomplete="off" />)
 
       if method && !%w[get post].include?(method.to_s)
         txt << %(<input name="_method" type="hidden" value="#{method}" autocomplete="off" />)
