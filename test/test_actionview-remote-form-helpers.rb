@@ -121,14 +121,14 @@ module ApplicationTests
         assert_select "form" do
           assert_select "[data-remote]", false
         end
-        assert_select "input[type=submit][data-disable-with]", false
+        assert_select 'input[type=submit][data-disable-with="Create User"]'
       end
     end
 
     def test_form_with_config
       Dir.chdir(tmp_path) do
         add_to_config("config.action_view.form_with_generates_remote_forms = true")
-        add_to_config("config.action_view.automatically_disable_submit_tag = true")
+        add_to_config("config.action_view.automatically_disable_submit_tag = false")
 
         app("development")
 
@@ -137,7 +137,7 @@ module ApplicationTests
         assert_select "form" do
           assert_select "[data-remote=true]"
         end
-        assert_select 'input[type=submit][data-disable-with="Create User"]'
+        assert_select "input[type=submit][data-disable-with]", false
       end
     end
 
@@ -149,7 +149,7 @@ module ApplicationTests
         assert_equal 200, last_response.status
         assert_select "form[data-remote=true]", false
         assert_select "input[name=authenticity_token]"
-        assert_select "input[type=submit][data-disable-with]", false
+        assert_select 'input[type=submit][data-disable-with="Create User"]'
       end
     end
 
@@ -163,7 +163,7 @@ module ApplicationTests
         assert_equal 200, last_response.status
         assert_select "form[data-remote=true]"
         assert_select "input[name=authenticity_token]", false
-        assert_select "input[type=submit][data-disable-with]", false
+        assert_select 'input[type=submit][data-disable-with="Create User"]'
       end
     end
 
@@ -174,21 +174,21 @@ module ApplicationTests
         get "/form_for_example"
         assert_equal 200, last_response.status
         assert_select "form[data-remote=true]", false
-        assert_select "input[type=submit][data-disable-with]", false
+        assert_select 'input[type=submit][data-disable-with="Create User"]'
       end
     end
 
     def test_form_for_with_config
       Dir.chdir(tmp_path) do
         add_to_config("config.action_view.form_with_generates_remote_forms = true")
-        add_to_config("config.action_view.automatically_disable_submit_tag = true")
+        add_to_config("config.action_view.automatically_disable_submit_tag = false")
 
         app("development")
 
         get "/form_for_example"
         assert_equal 200, last_response.status
         assert_select "form[data-remote=true]", false
-        assert_select 'input[type=submit][data-disable-with="Create User"]'
+        assert_select "input[type=submit][data-disable-with]", false
       end
     end
 
@@ -199,7 +199,7 @@ module ApplicationTests
         get "/form_for_with_remote_example"
         assert_equal 200, last_response.status
         assert_select "form[data-remote=true]"
-        assert_select "input[type=submit][data-disable-with]", false
+        assert_select 'input[type=submit][data-disable-with="Create User"]'
       end
     end
 
